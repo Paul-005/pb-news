@@ -74,21 +74,45 @@ class _HeadlinesState extends State<Headlines> {
     return Column(
       children: [
         Card(
-         child: Column(
-           children: news.map((element) => 
-           Column(
-             children: [
-               Container(
-                 margin: EdgeInsets.symmetric(horizontal:20.0),
-                child: Text(element['title'], style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
-               ),
-               Image.network(element['urlToImage'], height: 200, width: 300,)
-             ],
-           )
-          ).toList(),
+          child: Column(
+            children: news
+                .map((element) => GestureDetector(
+                      onTap: () {
+                        print(element['urlToImage']);
+                      },
+                      child: Column(
+                        children: [
+                          Image.network(element['urlToImage'],
+                              height: 200, width: 300),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(10.0, 50.0, 10.0, 0),
+                            child: Column(
+                              children: [
+                                Text(
+                                  element['title'],
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 10.0),
+                                Text(
+                                  element['description'],
+                                  style: TextStyle(
+                                      fontSize: 10.0,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ))
+                .toList(),
+          ),
         ),
-      ),
-      SizedBox(height: 20.0,)
+        SizedBox(
+          height: 20.0,
+        )
       ],
     );
   }
@@ -96,16 +120,16 @@ class _HeadlinesState extends State<Headlines> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: loading
-            ? loadingWidget()
-            : Container(
+      body: loading
+          ? loadingWidget()
+          : Container(
               margin: EdgeInsets.symmetric(vertical: 20),
-                child: SingleChildScrollView(
-                  child: Column(
-                      children: news.map((val) => newsCard(val)).toList(),                 
-                    ),
-                  ),  
+              child: SingleChildScrollView(
+                child: Column(
+                  children: news.map((val) => newsCard(val)).toList(),
+                ),
               ),
-              );
+            ),
+    );
   }
 }
