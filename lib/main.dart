@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pbnewsapp/screens/Category.dart';
 import 'package:pbnewsapp/screens/Headlines.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pbnewsapp/screens/SearchScreen.dart';
@@ -41,7 +42,7 @@ class MyApp extends StatelessWidget {
             tabs: [
               Tab(icon: FaIcon(FontAwesomeIcons.solidNewspaper)),
               Tab(icon: Icon(Icons.search)),
-              Tab(icon: Icon(Icons.settings)),
+              Tab(icon: Icon(Icons.category)),
             ],
           ),
         ),
@@ -49,7 +50,7 @@ class MyApp extends StatelessWidget {
           children: [
             Headlines(),
             SearchScreen(),
-            Headlines(),
+            ChooseCategory(),
           ],
         ),
       ),

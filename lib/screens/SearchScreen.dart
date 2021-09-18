@@ -61,9 +61,10 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> getResults() async {
-    String url = "https://newsapi.org/v2/everything?q=" +
-        searchString +
-        "&apiKey=560cfb6960394dee92010760a46d6f4b";
+    String url = "https://newsapi.org/v2/everything?q=" + searchString + "&apiKey=560cfb6960394dee92010760a46d6f4b";
+    setState(() {
+      news = [];
+    });
 
     var response = await get(Uri.parse(url));
 
