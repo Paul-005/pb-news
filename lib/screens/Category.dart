@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:pbnewsapp/screens/Loading.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChooseCategory extends StatefulWidget {
   @override
@@ -9,15 +10,19 @@ class ChooseCategory extends StatefulWidget {
 }
 
 class _ChooseCategoryState extends State<ChooseCategory> {
-  var category = '';
+  var category = 'business';
   List news = [];
   bool loading = true;
   var error = '';
 
   Future<void> getNews() async {
-    String url = "https://newsapi.org/v2/top-headlines?&category=" +
-        "business" +
+    String url = "https://newsapi.org/v2/top-headlines?country=in&category=" +
+        category +
         "&apiKey=560cfb6960394dee92010760a46d6f4b";
+
+    setState(() {
+      loading = true;
+    });
 
     try {
       var response = await get(Uri.parse(url));
@@ -65,7 +70,9 @@ class _ChooseCategoryState extends State<ChooseCategory> {
             child: Column(
               children: news
                   .map((element) => GestureDetector(
-                        onTap: () => print(element['urlToImage']),
+                        onTap: () {
+                          newsUrl(element['articleUrl']);
+                        },
                         child: Column(
                           children: [
                             Image.network(element['urlToImage'],
@@ -109,6 +116,10 @@ class _ChooseCategoryState extends State<ChooseCategory> {
     getNews();
   }
 
+  void newsUrl(_url) async {
+    await canLaunch(_url) ? await launch(_url) : errorCard();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,26 +127,50 @@ class _ChooseCategoryState extends State<ChooseCategory> {
           ? LoadingScreen()
           : Container(
               margin: EdgeInsets.symmetric(vertical: 20),
-              child: SingleChildScrollView(
-                child: news.length == 0
-                    ? Card(
-                        child: Column(
+              child: RefreshIndicator(
+                onRefresh: getNews,
+                child: SingleChildScrollView(
+                  child: news.length == 0
+                      ? errorCard()
+                      : Column(
                           children: [
-                            ListTile(
-                                title: Text(error),
-                                leading: Icon(Icons.error_outline_rounded)),
-                            TextButton.icon(
-                                onPressed: getNews,
-                                icon: Icon(Icons.refresh_outlined),
-                                label: Text('Refresh'))
+                            Text(category.toUpperCase(),
+                                style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red)),
+                            Column(
+                              children:
+                                  news.map((val) => newsCard(val)).toList(),
+                            )
                           ],
                         ),
-                      )
-                    : Column(
-                        children: news.map((val) => newsCard(val)).toList(),
-                      ),
+                ),
               ),
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          bottomSheet(context);
+        },
+        child: Icon(Icons.category),
+      ),
+    );
+  }
+
+  Card errorCard() {
+    return Card(
+      child: Column(
+        children: [
+          ListTile(
+              title:
+                  Text(error.length == 0 ? 'No News Found' : error.toString()),
+              leading: Icon(Icons.error_outline_rounded)),
+          TextButton.icon(
+              onPressed: getNews,
+              icon: Icon(Icons.refresh_outlined),
+              label: Text('Refresh'))
+        ],
+      ),
     );
   }
 
@@ -155,19 +190,11 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                        child: Text('Business'),
-                        onPressed: () {
-                          setState(() {
-                            category = 'business';
-                          });
-                          getNews();
-                        }),
-                    SizedBox(width: 20.0),
-                    ElevatedButton(
                         child: Text('General'),
                         onPressed: () {
                           setState(() {
                             category = 'general';
+                            news = [];
                           });
                           getNews();
                         }),
@@ -177,35 +204,55 @@ class _ChooseCategoryState extends State<ChooseCategory> {
                         onPressed: () {
                           setState(() {
                             category = 'science';
+                            news = [];
                           });
-                        })
+                          getNews();
+                        }),
+                    SizedBox(width: 20.0),
+                    ElevatedButton(
+                        child: Text('Health'),
+                        onPressed: () {
+                          setState(() {
+                            category = 'health';
+                            news = [];
+                          });
+                          getNews();
+                        }),
+                    SizedBox(width: 20.0),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      child: Text('Sports'),
-                      onPressed: () => setState(() {
-                        category = 'sports';
-                      }),
-                    ),
+                        child: Text('Sports'),
+                        onPressed: () {
+                          setState(() {
+                            category = 'sports';
+                            news = [];
+                          });
+                          getNews();
+                        }),
                     SizedBox(width: 20.0),
                     ElevatedButton(
                         child: Text('Technology'),
                         onPressed: () {
                           setState(() {
                             category = 'technology';
+                            news = [];
                           });
                           getNews();
                         }),
                     SizedBox(width: 20.0),
                     ElevatedButton(
-                      child: Text('Entertainment'),
-                      onPressed: () => setState(() {
-                        category = 'entertainment';
-                      }),
-                    )
+                        child: Text('Entertainment'),
+                        onPressed: () {
+                          setState(() {
+                            category = 'entertainment';
+                            news = [];
+                          });
+                          getNews();
+                        })
                   ],
                 ),
               ],

@@ -50,8 +50,8 @@ class MyApp extends StatelessWidget {
           children: [
             Headlines(),
             SearchScreen(),
-            ChooseCategory(),
-          ],
+            ChooseCategory()          
+            ],
         ),
       ),
     );

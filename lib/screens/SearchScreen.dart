@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -16,41 +17,46 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget newsCard(val) {
     return Column(
       children: [
-        Card(
-          child: Column(
-            children: news
-                .map((element) => GestureDetector(
-                      onTap: () {
-                        print(element['urlToImage']);
-                      },
-                      child: Column(
-                        children: [
-                          Image.network(element['urlToImage'],
-                              height: 200, width: 300),
-                          Container(
-                            margin: EdgeInsets.fromLTRB(10.0, 50.0, 10.0, 0),
-                            child: Column(
-                              children: [
-                                Text(
-                                  element['title'],
-                                  style: TextStyle(
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 10.0),
-                                Text(
-                                  element['description'],
-                                  style: TextStyle(
-                                      fontSize: 10.0,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
+        GestureDetector(
+          onTap: () {
+            newsUrl(val['articleUrl']);
+          },
+          child: Card(
+            child: Column(
+              children: news
+                  .map((element) => GestureDetector(
+                        onTap: () {
+                          newsUrl(element['urlToImage']);
+                        },
+                        child: Column(
+                          children: [
+                            Image.network(element['urlToImage'],
+                                height: 200, width: 300),
+                            Container(
+                              margin: EdgeInsets.fromLTRB(10.0, 50.0, 10.0, 0),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    element['title'],
+                                    style: TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 10.0),
+                                  Text(
+                                    element['description'],
+                                    style: TextStyle(
+                                        fontSize: 10.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ))
-                .toList(),
+                          ],
+                        ),
+                      ))
+                  .toList(),
+            ),
           ),
         ),
         SizedBox(
@@ -61,9 +67,12 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> getResults() async {
-    String url = "https://newsapi.org/v2/everything?q=" + searchString + "&apiKey=560cfb6960394dee92010760a46d6f4b";
+    String url = "https://newsapi.org/v2/everything?q=" +
+        searchString +
+        "&apiKey=560cfb6960394dee92010760a46d6f4b";
     setState(() {
       news = [];
+      loading = true;
     });
 
     var response = await get(Uri.parse(url));
@@ -91,6 +100,10 @@ class _SearchScreenState extends State<SearchScreen> {
       });
     }
     print(news);
+  }
+
+  void newsUrl(_url) async {
+    await canLaunch(_url) ? await launch(_url) : throw 'Could not launch $_url';
   }
 
   @override

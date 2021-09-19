@@ -1,23 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:pbnewsapp/screens/Loading.dart';
 
-class Article {
-  String title;
-  String description;
-  String urlToImage;
-  String content;
-  String articleUrl;
-
-  Article(
-      {required this.title,
-      required this.description,
-      required this.content,
-      required this.urlToImage,
-      required this.articleUrl});
-}
 
 class Headlines extends StatefulWidget {
   @override
@@ -30,6 +16,9 @@ class _HeadlinesState extends State<Headlines> {
   var error = '';
 
   Future<void> getNews() async {
+    setState(() {
+      loading = true;
+    });
     String url =
         "http://newsapi.org/v2/top-headlines?country=in&sortBy=publishedAt&language=en&apiKey=560cfb6960394dee92010760a46d6f4b";
 
@@ -81,6 +70,10 @@ class _HeadlinesState extends State<Headlines> {
     );
   }
 
+  void newsUrl(_url)   async {
+    await canLaunch(_url) ? await launch(_url) : throw 'Could not launch $_url';
+  }
+
   Widget newsCard(val) {
     return Container(
       margin: EdgeInsets.all(20.0),
@@ -89,9 +82,9 @@ class _HeadlinesState extends State<Headlines> {
           Card(
             elevation: 3,
             child: Column(
-              children: news.map((element) => 
-                  GestureDetector(
-                        onTap: () => print(element['urlToImage']),
+              children: news
+                  .map((element) => GestureDetector(
+                        onTap: () => newsUrl(element['articleUrl']),
                         child: Column(
                           children: [
                             Image.network(element['urlToImage'],
@@ -141,8 +134,13 @@ class _HeadlinesState extends State<Headlines> {
                     ? Card(
                         child: Column(
                           children: [
-                            ListTile(title: Text(error),leading: Icon(Icons.error_outline_rounded)),
-                            TextButton.icon(onPressed: getNews, icon: Icon(Icons.refresh_outlined), label: Text('Refresh'))
+                            ListTile(
+                                title: Text(error),
+                                leading: Icon(Icons.error_outline_rounded)),
+                            TextButton.icon(
+                                onPressed: getNews,
+                                icon: Icon(Icons.refresh_outlined),
+                                label: Text('Refresh'))
                           ],
                         ),
                       )
